@@ -8,6 +8,7 @@ public class Contact {
     private String phone;
     private String facebookName;
     private String email;
+    private String gmail;
 
     public Contact() {
 
@@ -51,5 +52,13 @@ public class Contact {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getGmail() {
+        return gmail;
+    }
+
+    public void setGmail(String gmail) {
+        this.gmail = gmail;
     }
 }

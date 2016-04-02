@@ -53,6 +53,10 @@ public class SystemReader {
             String actype = ac.type;
             // Take your time to look at all available accounts
             System.out.println("Accounts : " + acname + ", " + actype);
+            if (actype.equals("com.google") && settings.isGoogle()) {
+                res.setGmail(acname);
+                res.setEmail(acname);
+            }
         }
         return res;
     }

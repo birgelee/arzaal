@@ -1,6 +1,7 @@
 package com.arzaal.arzaal;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.arzaal.arzaal.contact.Contact;
@@ -22,6 +25,9 @@ public class SharingScreen extends AppCompatActivity {
 
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
+    public static final String PREFS_NAME = "MainSettings";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,26 +38,42 @@ public class SharingScreen extends AppCompatActivity {
 
         CheckBox facebookCheckBox = (CheckBox)findViewById(R.id.facebookCheckBox);
         CheckBox contactInfoCheckBox = (CheckBox)findViewById(R.id.contactInfoCheckBox);
+        CheckBox googleCheckBox = (CheckBox)findViewById(R.id.googleCheckBox);
+
 
         askForPermissionAndWait(new String[]{Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.GET_ACCOUNTS});
 
+        final ContactSyncSettings settings = new ContactSyncSettings();
+        final SharedPreferences filePreferences = getSharedPreferences(PREFS_NAME, 0);
+        settings.setGoogle(filePreferences.getBoolean("google", false));
+        settings.setFacebook(filePreferences.getBoolean("facebook", false));
+        settings.setPhoneContactInfo(filePreferences.getBoolean("contactInfo", true));
 
-        /*Contact c = new Contact();
-        c.setName("Joe Blow3");
-        c.setEmail("test@email.com");
-        c.setPhone("2134531222");*/
+        facebookCheckBox.setChecked(settings.isFacebook());
+        googleCheckBox.setChecked(settings.isGoogle());
+        contactInfoCheckBox.setChecked(settings.isPhoneContactInfo());
 
-        ContactSyncSettings settings = new ContactSyncSettings();
-        if (facebookCheckBox.isChecked()) {
-            settings.setFacebook(true);
-        } else {
-            settings.setFacebook(false);
-        }
-        if (contactInfoCheckBox.isChecked()) {
-            settings.setPhoneContactInfo(true);
-        } else {
-            settings.setPhoneContactInfo(false);
-        }
+        facebookCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settings.setFacebook(isChecked);
+                filePreferences.edit().putBoolean("facebook", isChecked).commit();
+            }
+        });
+        googleCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settings.setGoogle(isChecked);
+                filePreferences.edit().putBoolean("google", isChecked).commit();
+            }
+        });
+        contactInfoCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settings.setPhoneContactInfo(isChecked);
+                filePreferences.edit().putBoolean("contactInfo", isChecked).commit();
+            }
+        });
 
 
         Contact c = SystemReader.readSystemContact(settings, this);

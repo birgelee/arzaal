@@ -6,6 +6,7 @@ package com.arzaal.arzaal.contact;
 public class ContactSyncSettings {
     private boolean facebook;
     private boolean phoneContactInfo;
+    private boolean google;
     public ContactSyncSettings() {
 
     }
@@ -24,5 +25,13 @@ public class ContactSyncSettings {
 
     public void setPhoneContactInfo(boolean phoneContactInfo) {
         this.phoneContactInfo = phoneContactInfo;
+    }
+
+    public boolean isGoogle() {
+        return google;
+    }
+
+    public void setGoogle(boolean google) {
+        this.google = google;
     }
 }
