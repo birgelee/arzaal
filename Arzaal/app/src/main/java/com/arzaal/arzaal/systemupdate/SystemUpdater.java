@@ -1,7 +1,9 @@
 package com.arzaal.arzaal.systemupdate;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
+import android.content.pm.PackageManager;
 import android.provider.ContactsContract;
 import android.widget.Toast;
 
@@ -15,14 +17,21 @@ import java.util.ArrayList;
  */
 public class SystemUpdater {
 
-    private void addContactPrivate(Activity activity) {
-        String DisplayName = "XYZ";
-        String MobileNumber = "123456";
-        String HomeNumber = "1111";
-        String WorkNumber = "2222";
-        String emailID = "email@nomail.com";
-        String company = "bad";
-        String jobTitle = "abcd";
+
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
+
+    private void addContactPrivateWrapper(Contact contact, Activity activity) {
+
+        addContactPrivate(contact, activity);
+    }
+    private void addContactPrivate(Contact contact, Activity activity) {
+        String DisplayName = contact.getName();
+        String MobileNumber = contact.getPhone();
+        String HomeNumber = null;
+        String WorkNumber = null;
+        String emailID = contact.getEmail();
+        String company = "";
+        String jobTitle = "";
 
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
@@ -115,6 +124,6 @@ public class SystemUpdater {
         }
     }
     public static void addContactToSystem(Contact contact, SharingScreen activity) {
-        (new SystemUpdater()).addContactPrivate(activity);
+        (new SystemUpdater()).addContactPrivateWrapper(contact, activity);
     }
 }

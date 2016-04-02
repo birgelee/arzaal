@@ -1,5 +1,7 @@
 package com.arzaal.arzaal;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +15,8 @@ import com.arzaal.arzaal.contact.Contact;
 import com.arzaal.arzaal.systemupdate.SystemUpdater;
 
 public class SharingScreen extends AppCompatActivity {
+
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +34,24 @@ public class SharingScreen extends AppCompatActivity {
             }
         });
 
+        int hasWriteContactsPermission = checkSelfPermission(Manifest.permission.WRITE_CONTACTS);
+        if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_CONTACTS},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+        }
+        while (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            hasWriteContactsPermission = checkSelfPermission(Manifest.permission.WRITE_CONTACTS);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         Contact c = new Contact();
-        c.setName("Joe Blow");
+        c.setName("Joe Blow3");
         c.setEmail("test@email.com");
-        c.setPhone("213 453 1222");
+        c.setPhone("2134531222");
 
         SystemUpdater.addContactToSystem(c, this);
 
