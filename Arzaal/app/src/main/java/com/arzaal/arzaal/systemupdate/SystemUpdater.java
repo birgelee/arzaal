@@ -1,9 +1,7 @@
 package com.arzaal.arzaal.systemupdate;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
-import android.content.pm.PackageManager;
 import android.provider.ContactsContract;
 import android.widget.Toast;
 

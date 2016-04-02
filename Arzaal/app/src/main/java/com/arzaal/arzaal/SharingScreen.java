@@ -10,9 +10,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.arzaal.arzaal.contact.Contact;
+import com.arzaal.arzaal.contact.ContactSyncSettings;
 import com.arzaal.arzaal.systemread.SystemReader;
 import com.arzaal.arzaal.systemupdate.SystemUpdater;
 
@@ -27,16 +29,11 @@ public class SharingScreen extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
-        askForPermissionAndWait(new String[] {Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_PHONE_STATE});
+        CheckBox facebookCheckBox = (CheckBox)findViewById(R.id.facebookCheckBox);
+        CheckBox contactInfoCheckBox = (CheckBox)findViewById(R.id.contactInfoCheckBox);
+
+        askForPermissionAndWait(new String[]{Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.GET_ACCOUNTS});
 
 
         /*Contact c = new Contact();
@@ -44,7 +41,20 @@ public class SharingScreen extends AppCompatActivity {
         c.setEmail("test@email.com");
         c.setPhone("2134531222");*/
 
-        Contact c = SystemReader.readSystemContact(this);
+        ContactSyncSettings settings = new ContactSyncSettings();
+        if (facebookCheckBox.isChecked()) {
+            settings.setFacebook(true);
+        } else {
+            settings.setFacebook(false);
+        }
+        if (contactInfoCheckBox.isChecked()) {
+            settings.setPhoneContactInfo(true);
+        } else {
+            settings.setPhoneContactInfo(false);
+        }
+
+
+        Contact c = SystemReader.readSystemContact(settings, this);
 
 
         SystemUpdater.addContactToSystem(c, this);

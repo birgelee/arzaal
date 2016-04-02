@@ -1,5 +1,7 @@
 package com.arzaal.arzaal.systemread;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,12 +9,13 @@ import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 
 import com.arzaal.arzaal.contact.Contact;
+import com.arzaal.arzaal.contact.ContactSyncSettings;
 
 /**
  * Created by henry on 4/2/16.
  */
 public class SystemReader {
-    private Contact readSystemContactPrivate(Activity activity) {
+    private Contact readSystemContactPrivate(ContactSyncSettings settings, Activity activity) {
         String name = "";
         String phoneNumber = "";
 
@@ -31,10 +34,29 @@ public class SystemReader {
 
         Contact res = new Contact();
         res.setPhone(phoneNumber);
-        res.setName(name);
+        if (settings.isPhoneContactInfo()) {
+            res.setName(name);
+        } else {
+            res.setName("fake name");
+        }
+
+        if (settings.isFacebook()) {
+            res.setFacebookName("test");
+        }
+
+        // Not used, might be used later to add accounts.
+        AccountManager am = AccountManager.get(activity);
+        Account[] accounts = am.getAccounts();
+
+        for (Account ac : accounts) {
+            String acname = ac.name;
+            String actype = ac.type;
+            // Take your time to look at all available accounts
+            System.out.println("Accounts : " + acname + ", " + actype);
+        }
         return res;
     }
-    public static Contact readSystemContact(Activity activity) {
-        return (new SystemReader()).readSystemContactPrivate(activity);
+    public static Contact readSystemContact(ContactSyncSettings settings, Activity activity) {
+        return (new SystemReader()).readSystemContactPrivate(settings, activity);
     }
 }
