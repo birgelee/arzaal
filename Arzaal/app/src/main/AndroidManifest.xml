@@ -26,13 +26,14 @@
         </activity>
 
         <service
-            android:name=".com.arzaal.arzaal.ProximityService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
             android:name=".proximity.ProximityService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity
+            android:name=".AcceptDeny"
+            android:label="@string/title_activity_accept_deny"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
