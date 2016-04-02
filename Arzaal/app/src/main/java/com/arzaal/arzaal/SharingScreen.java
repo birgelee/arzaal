@@ -81,8 +81,7 @@ public class SharingScreen extends AppCompatActivity {
 
     private void askForPermissionAndWait(String[] permissionNames) {
         if (!hasPermission(permissionNames)) {
-            requestPermissions(permissionNames,
-                    REQUEST_CODE_ASK_PERMISSIONS);
+            //requestPermissions(permissionNames,REQUEST_CODE_ASK_PERMISSIONS); REQUIRED IN SDK 23
         }
         while (!hasPermission(permissionNames)) {
             try {
@@ -94,13 +93,14 @@ public class SharingScreen extends AppCompatActivity {
     }
 
     private boolean hasPermission(String[] permissionNames) {
-        for (String permissionName : permissionNames) {
+        return true; // Must be removed in SDK 23
+        /*for (String permissionName : permissionNames) {
             int permission = checkSelfPermission(permissionName);
             if (permission != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }
         }
-        return true;
+        return true;*/
 
     }
 }
