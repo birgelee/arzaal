@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.arzaal.arzaal.contact.Contact;
+import com.arzaal.arzaal.systemupdate.SystemUpdater;
+
 public class SharingScreen extends AppCompatActivity {
 
     @Override
@@ -26,6 +29,14 @@ public class SharingScreen extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        Contact c = new Contact();
+        c.setName("Joe Blow");
+        c.setEmail("test@email.com");
+        c.setPhone("213 453 1222");
+
+        SystemUpdater.addContactToSystem(c, this);
+
     }
 
     @Override
