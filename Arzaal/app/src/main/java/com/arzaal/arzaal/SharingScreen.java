@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.arzaal.arzaal.contact.Contact;
+import com.arzaal.arzaal.systemread.SystemReader;
 import com.arzaal.arzaal.systemupdate.SystemUpdater;
 
 public class SharingScreen extends AppCompatActivity {
@@ -34,24 +35,16 @@ public class SharingScreen extends AppCompatActivity {
             }
         });
 
-        int hasWriteContactsPermission = checkSelfPermission(Manifest.permission.WRITE_CONTACTS);
-        if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_CONTACTS},
-                    REQUEST_CODE_ASK_PERMISSIONS);
-        }
-        while (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-            hasWriteContactsPermission = checkSelfPermission(Manifest.permission.WRITE_CONTACTS);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        askForPermissionAndWait(Manifest.permission.WRITE_CONTACTS);
+        //askForPermissionAndWait(Manifest.permission.READ_PHONE_STATE);
 
         Contact c = new Contact();
         c.setName("Joe Blow3");
         c.setEmail("test@email.com");
         c.setPhone("2134531222");
+
+        //Contact c = SystemReader.readSystemContact(this);
+
 
         SystemUpdater.addContactToSystem(c, this);
 
@@ -77,5 +70,29 @@ public class SharingScreen extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void askForPermissionAndWait(String permissionName) {
+        if (!hasPermission(permissionName)) {
+            requestPermissions(new String[]{permissionName},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+        }
+        while (!hasPermission(permissionName)) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private boolean hasPermission(String permissionName) {
+        int permission = checkSelfPermission(permissionName);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+
+        return true;
+
     }
 }
