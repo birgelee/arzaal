@@ -53,7 +53,7 @@ public class SharingScreen extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(this, ProximityService.class));
+        //stopService(new Intent(this, ProximityService.class));
         super.onDestroy();
     }
 

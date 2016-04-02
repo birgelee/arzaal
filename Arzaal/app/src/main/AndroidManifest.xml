@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-feature android:name="android.hardware.nfc.hce" />
 
     <application
         android:allowBackup="true"
@@ -27,8 +28,16 @@
 
         <service
             android:name=".proximity.ProximityService"
+            android:permission="android.permission.BIND_NFC_SERVICE"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true">
+            <intent-filter >
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.host_apdu_service"
+                android:resource="@xml/proximityservice"/>
+
+        </service>
 
         <activity
             android:name=".AcceptDeny"

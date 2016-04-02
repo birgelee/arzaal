@@ -2,4 +2,6 @@
     <string name="app_name">Arzaal</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_accept_deny">AcceptDeny</string>
+    <string name="proximityservice">Service of proximity</string>
+    <string name="aiddescriptor">AID for Arzaal</string>
 </resources>

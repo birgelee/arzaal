@@ -2,16 +2,25 @@ package com.arzaal.arzaal.proximity;
 
 import android.app.Service;
 import android.content.Intent;
+import android.nfc.cardemulation.HostApduService;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.Toast;
 
-public class ProximityService extends Service {
+public class ProximityService extends HostApduService {
     public ProximityService() {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public byte[] processCommandApdu(byte[] commandApdu, Bundle extras) {
+        System.out.println("Got some APDU data!!!");
+        Toast.makeText(this, "Data!", Toast.LENGTH_LONG).show();
+        return new byte[0];
+    }
+
+    @Override
+    public void onDeactivated(int reason) {
+        Toast.makeText(this, "Service deactivated", Toast.LENGTH_LONG).show();
     }
 
     @Override

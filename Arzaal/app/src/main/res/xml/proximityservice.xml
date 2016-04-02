@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/proximityservice"
+    android:requireDeviceUnlock="false">
+    <aid-group android:description="@string/aiddescriptor"
+        android:category="other">
+        <aid-filter android:name="F7291438682134191476"/>
+    </aid-group>
+
+</PreferenceScreen>
