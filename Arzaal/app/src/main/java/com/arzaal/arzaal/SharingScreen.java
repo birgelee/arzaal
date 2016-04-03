@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -37,6 +39,15 @@ public class SharingScreen extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+        adapter.setNdefPushMessage(null, this, this);
+        adapter.enableReaderMode(this, new NfcAdapter.ReaderCallback() {
+            @Override
+            public void onTagDiscovered(Tag tag) {
+                Toast.makeText(SharingScreen.this, "Found a tag!", Toast.LENGTH_LONG).show();
+
+            }
+        }, NfcAdapter.FLAG_READER_NFC_A | NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, null);
 
 
 
