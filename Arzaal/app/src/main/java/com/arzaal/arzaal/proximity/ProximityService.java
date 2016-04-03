@@ -27,7 +27,7 @@ public class ProximityService extends HostApduService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Let it continue running until it is stopped.
         Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
