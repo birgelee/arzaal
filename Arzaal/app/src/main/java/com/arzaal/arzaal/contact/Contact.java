@@ -61,4 +61,14 @@ public class Contact {
     public void setGmail(String gmail) {
         this.gmail = gmail;
     }
+
+    public String serialize() {
+        return "THIS IS A TEST";
+    }
+
+    public static Contact deserialize(String serialized) {
+        Contact res = new Contact();
+        res.setName("From Serialze");
+        return res;
+    }
 }

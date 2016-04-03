@@ -1,17 +1,22 @@
 package com.arzaal.arzaal;
 
 import android.Manifest;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.arzaal.arzaal.contact.Contact;
 import com.arzaal.arzaal.systemread.SystemReader;
 import com.arzaal.arzaal.systemupdate.SystemUpdater;
 
-public class SharingScreen extends AppCompatActivity {
+public class SharingScreen extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback {
 
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
@@ -27,6 +32,18 @@ public class SharingScreen extends AppCompatActivity {
         Contact c = SystemReader.readSystemContact(SettingsManager.manageSettings(this), this);
 
         SystemUpdater.addContactToSystem(c, this);
+
+        NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mAdapter == null) {
+            Toast.makeText(this, "Sorry, you don't have NFC.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (!mAdapter.isEnabled()) {
+            Toast.makeText(this, "Please enable NFC via Settings.", Toast.LENGTH_LONG).show();
+        }
+
+        mAdapter.setNdefPushMessageCallback(this, this);
 
     }
 
@@ -80,5 +97,18 @@ public class SharingScreen extends AppCompatActivity {
         }
         return true;*/
 
+    }
+
+    /**
+     * Ndef Record that will be sent over via NFC
+     * @param nfcEvent
+     * @return
+     */
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
+        String message = SystemReader.readSystemContact(SettingsManager.manageSettings(this), this).serialize();
+        NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
+        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
+        return ndefMessage;
     }
 }

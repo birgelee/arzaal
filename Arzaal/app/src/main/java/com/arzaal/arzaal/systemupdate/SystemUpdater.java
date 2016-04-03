@@ -121,7 +121,7 @@ public class SystemUpdater {
             Toast.makeText(activity, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
-    public static void addContactToSystem(Contact contact, SharingScreen activity) {
+    public static void addContactToSystem(Contact contact, Activity activity) {
         (new SystemUpdater()).addContactPrivateWrapper(contact, activity);
     }
 }
