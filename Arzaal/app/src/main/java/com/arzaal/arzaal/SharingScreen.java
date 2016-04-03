@@ -41,7 +41,7 @@ public class SharingScreen extends Activity {
         setContentView(R.layout.activity_sharing_screen);
 
         askForPermissionAndWait(new String[]{Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.GET_ACCOUNTS});
-
+        SettingsManager.manageSettings(this);
 
 
 
