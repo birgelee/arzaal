@@ -63,12 +63,16 @@ public class Contact {
     }
 
     public String serialize() {
-        return "THIS IS A TEST";
+        return "" + name + ":" + phone + ":" + gmail;
     }
 
     public static Contact deserialize(String serialized) {
+        String[] split = serialized.split(":");
+
         Contact res = new Contact();
-        res.setName("From Serialze");
+        res.setName(split[0]);
+        res.setPhone(split[1]);
+        res.setGmail(split[2]);
         return res;
     }
 }

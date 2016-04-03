@@ -1,54 +1,165 @@
 package com.arzaal.arzaal;
 
 import android.Manifest;
+import android.app.Activity;
+import android.net.nsd.NsdServiceInfo;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.arzaal.arzaal.contact.Contact;
 import com.arzaal.arzaal.systemread.SystemReader;
 import com.arzaal.arzaal.systemupdate.SystemUpdater;
 
-public class SharingScreen extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback {
+
+public class SharingScreen extends Activity {
 
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
+
+
+    NsdHelper mNsdHelper;
+
+    private Handler mUpdateHandler;
+
+    public static final String TAG = "NsdChat";
+
+    public ChatConnection mConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sharing_screen);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         askForPermissionAndWait(new String[]{Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.GET_ACCOUNTS});
 
+
+
+
+        mUpdateHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                String chatLine = msg.getData().getString("msg");
+
+                SystemUpdater.addContactToSystem(Contact.deserialize(chatLine), SharingScreen.this);
+                Toast.makeText(SharingScreen.this, chatLine, Toast.LENGTH_LONG).show();
+            }
+        };
+
+        mConnection = new ChatConnection(mUpdateHandler);
+
+
+
+
+        mNsdHelper = new NsdHelper(this);
+        mNsdHelper.initializeNsd();
+
+        initComs();
+
+        mHandler = new Handler();
+        startRepeatingTask();
+    }
+
+
+    public void advertise() {
+        // Register service
+        if(mConnection.getLocalPort() > -1) {
+            mNsdHelper.registerService(mConnection.getLocalPort());
+        } else {
+            Log.d(TAG, "ServerSocket isn't bound.");
+        }
+    }
+
+    public void discover() {
+        mNsdHelper.discoverServices();
+    }
+
+    public boolean connect() {
+        NsdServiceInfo service = mNsdHelper.getChosenServiceInfo();
+        if (service != null) {
+            Log.d(TAG, "Connecting.");
+            mConnection.connectToServer(service.getHost(),
+                    service.getPort());
+            return true;
+        } else {
+            Log.d(TAG, "No service to connect to!");
+            return false;
+        }
+    }
+
+    public void sendText(String text) {
+
+            String messageString =  text;
+            if (!messageString.isEmpty()) {
+                mConnection.sendMessage(messageString);
+            }
+    }
+
+
+    public void clickAdvertise(View v) {
+        // Register service
+        if(mConnection.getLocalPort() > -1) {
+            mNsdHelper.registerService(mConnection.getLocalPort());
+        } else {
+            Log.d(TAG, "ServerSocket isn't bound.");
+        }
+    }
+
+    public void clickDiscover(View v) {
+        mNsdHelper.discoverServices();
+    }
+
+    public void clickConnect(View v) {
+        NsdServiceInfo service = mNsdHelper.getChosenServiceInfo();
+        if (service != null) {
+            Log.d(TAG, "Connecting.");
+            mConnection.connectToServer(service.getHost(),
+                    service.getPort());
+        } else {
+            Log.d(TAG, "No service to connect to!");
+        }
+    }
+
+    public void clickSend(View v) {
+
         Contact c = SystemReader.readSystemContact(SettingsManager.manageSettings(this), this);
+        sendText(c.serialize());
 
-        SystemUpdater.addContactToSystem(c, this);
 
-        NfcAdapter mAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (mAdapter == null) {
-            Toast.makeText(this, "Sorry, you don't have NFC.", Toast.LENGTH_LONG).show();
-            return;
+
+    }
+
+
+
+    @Override
+    protected void onPause() {
+        if (mNsdHelper != null) {
+            mNsdHelper.stopDiscovery();
         }
+        super.onPause();
+    }
 
-        if (!mAdapter.isEnabled()) {
-            Toast.makeText(this, "Please enable NFC via Settings.", Toast.LENGTH_LONG).show();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mNsdHelper != null) {
+            mNsdHelper.discoverServices();
         }
-
-        mAdapter.setNdefPushMessageCallback(this, this);
-
     }
 
     @Override
     protected void onDestroy() {
+        mNsdHelper.tearDown();
+        mConnection.tearDown();
         super.onDestroy();
     }
 
@@ -87,6 +198,11 @@ public class SharingScreen extends AppCompatActivity implements NfcAdapter.Creat
         }
     }
 
+
+    public void initComs() {
+        advertise();
+
+    }
     private boolean hasPermission(String[] permissionNames) {
         return true; // Must be removed in SDK 23
         /*for (String permissionName : permissionNames) {
@@ -99,16 +215,35 @@ public class SharingScreen extends AppCompatActivity implements NfcAdapter.Creat
 
     }
 
-    /**
-     * Ndef Record that will be sent over via NFC
-     * @param nfcEvent
-     * @return
-     */
-    @Override
-    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-        String message = SystemReader.readSystemContact(SettingsManager.manageSettings(this), this).serialize();
-        NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
-        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
-        return ndefMessage;
+
+    private int mInterval = 500; // 5 seconds by default, can be changed later
+    private Handler mHandler;
+
+
+
+    Runnable mStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                if (!mConnection.isConnected()) {
+                    connect();
+                }
+
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                mHandler.postDelayed(mStatusChecker, mInterval);
+            }
+        }
+    };
+
+    void startRepeatingTask() {
+        mStatusChecker.run();
     }
+
+    void stopRepeatingTask() {
+        mHandler.removeCallbacks(mStatusChecker);
+    }
+
+
 }
