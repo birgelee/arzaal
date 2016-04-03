@@ -61,6 +61,8 @@ public class SharingScreen extends AppCompatActivity {
         SystemUpdater.addContactToSystem(c, this);
         startService(new Intent(this, ProximityService.class));
 
+
+        handleIntent(getIntent());
     }
 
     @Override
@@ -114,5 +116,9 @@ public class SharingScreen extends AppCompatActivity {
         }
         return true;*/
 
+    }
+
+    private void handleIntent(Intent intent) {
+        Toast.makeText(SharingScreen.this, "Found a tag!", Toast.LENGTH_LONG).show();
     }
 }
