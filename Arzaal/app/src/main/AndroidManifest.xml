@@ -25,14 +25,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".com.arzaal.arzaal.ProximityService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
-            android:name=".proximity.ProximityService"
-            android:enabled="true"
-            android:exported="true"></service>
     </application>
 
 </manifest>
