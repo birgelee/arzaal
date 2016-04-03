@@ -2,6 +2,8 @@ package com.arzaal.arzaal.proximity;
 
 import android.app.Service;
 import android.content.Intent;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -20,6 +22,7 @@ public class ProximityService extends HostApduService {
 
     @Override
     public void onDeactivated(int reason) {
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!! deactivated.");
         Toast.makeText(this, "Service deactivated", Toast.LENGTH_LONG).show();
     }
 
@@ -27,12 +30,13 @@ public class ProximityService extends HostApduService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Let it continue running until it is stopped.
         Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!! destroyed.");
         Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
     }
 }

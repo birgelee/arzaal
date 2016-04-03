@@ -39,35 +39,38 @@ public class SharingScreen extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+
         NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
 
-        //adapter.setNdefPushMessage(null, this, this);
-        adapter.enableReaderMode(this, new NfcAdapter.ReaderCallback() {
-            @Override
-            public void onTagDiscovered(Tag tag) {
-                Toast.makeText(SharingScreen.this, "Found a tag!", Toast.LENGTH_LONG).show();
+        adapter.setNdefPushMessage(null, this, this);
 
-            }
-        }, NfcAdapter.FLAG_READER_NFC_A, null);
 
 
 
         askForPermissionAndWait(new String[]{Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.GET_ACCOUNTS});
 
-        startService(new Intent(this, ProximityService.class));
+
+        Intent intent = getIntent();
+        if (intent.getAction() != null && intent.getAction().equals("android.intent.action.MAIN")) {
+            startService(new Intent(this, ProximityService.class));
+
+        } else {
+            System.out.println("Launched from intent!!!!");
+        }
+
         Contact c = SystemReader.readSystemContact(SettingsManager.manageSettings(this), this);
 
 
         SystemUpdater.addContactToSystem(c, this);
-        startService(new Intent(this, ProximityService.class));
 
 
-        handleIntent(getIntent());
+
     }
 
     @Override
     protected void onDestroy() {
-        //stopService(new Intent(this, ProximityService.class));
+        stopService(new Intent(this, ProximityService.class));
         super.onDestroy();
     }
 
@@ -118,7 +121,4 @@ public class SharingScreen extends AppCompatActivity {
 
     }
 
-    private void handleIntent(Intent intent) {
-        Toast.makeText(SharingScreen.this, "Found a tag!", Toast.LENGTH_LONG).show();
-    }
 }
