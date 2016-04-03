@@ -56,6 +56,7 @@ public class SharingScreen extends AppCompatActivity {
             startService(new Intent(this, ProximityService.class));
 
         } else {
+            Toast.makeText(this, "Service deactivated", Toast.LENGTH_LONG).show();
             System.out.println("Launched from intent!!!!");
         }
 
